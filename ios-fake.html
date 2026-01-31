@@ -33,26 +33,46 @@ html,body{margin:0;height:100%;background:#000;font-family:-apple-system,BlinkMa
 </div>
 
 <script>
-const socket = new WebSocket('wss://demo.piesocket.com/v3/channel/cm-plateau-demo?api_key=demokey&notify_self=1');
+const socket = new WebSocket(
+  'wss://demo.piesocket.com/v3/channel/cm-matguido-film?api_key=demokey&notify_self=1'
+);
 
-socket.onmessage = e => {
-  const d = JSON.parse(e.data);
-  if(d.type==='time') updateTime(d);
-  if(d.type==='notif') addNotif(d);
-};
+socket.addEventListener('message', (e) => {
+  let d;
+  try {
+    d = JSON.parse(e.data);
+  } catch {
+    return; // ignore messages non JSON
+  }
 
-function updateTime(d){
-  time.textContent = d.time;
-  date.textContent = d.date;
-  time.style.color = date.style.color = d.color;
-  if(d.wallpaper) phone.style.backgroundImage = `url(${d.wallpaper})`;
+  if (d.type === 'time') updateTime(d);
+  if (d.type === 'notif') addNotif(d);
+});
+
+function updateTime(d) {
+  document.getElementById('time').textContent = d.time;
+  document.getElementById('date').textContent = d.date;
+  document.getElementById('time').style.color = d.color;
+  document.getElementById('date').style.color = d.color;
+
+  if (d.wallpaper) {
+    document.getElementById('phone').style.backgroundImage =
+      `url('${d.wallpaper}')`;
+  }
 }
 
-function addNotif(d){
-  const n=document.createElement('div');
-  n.className='notif';
-  n.innerHTML=`<img src="${d.icon}"><div><strong>${d.app}</strong><div>${d.title}</div><div>${d.body}</div></div>`;
-  notifs.prepend(n);
+function addNotif(d) {
+  const n = document.createElement('div');
+  n.className = 'notif';
+  n.innerHTML = `
+    <img src="${d.icon}">
+    <div>
+      <strong>${d.app}</strong>
+      <div>${d.title}</div>
+      <div>${d.body}</div>
+    </div>
+  `;
+  document.getElementById('notifs').prepend(n);
 }
 </script>
 </body>
