@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<title>Fake iOS Screen</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+body{margin:0;background:black;font-family:-apple-system,BlinkMacSystemFont,sans-serif;display:flex;justify-content:center;align-items:center;height:100vh}
+.phone{width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background-size:cover;background-position:center;color:white}
+.overlay{position:absolute;inset:0;background:rgba(0,0,0,.25)}
+.status{display:flex;justify-content:space-between;padding:14px;font-size:14px}
+.lock{text-align:center;margin-top:60px}
+.time{font-size:64px;font-weight:200}
+.date{opacity:.85}
+.notifications{padding:20px;display:flex;flex-direction:column;gap:12px}
+.notif{background:rgba(255,255,255,.18);backdrop-filter:blur(20px);border-radius:16px;padding:14px;animation:slide .4s ease}
+@keyframes slide{from{opacity:0;transform:translateY(-20px)}to{opacity:1}}
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+  <div class="overlay"></div>
+  <div class="status"><span>📶</span><span>🔋</span></div>
+  <div class="lock"><div class="time" id="time"></div><div class="date" id="date"></div></div>
+  <div class="notifications" id="notifs"></div>
+</div>
+
+<script>
+const socket = new WebSocket('wss://demo.piesocket.com/v3/channel/court-metrage?api_key=demokey&notify_self=1');
+
+socket.onmessage = e => {
+  const data = JSON.parse(e.data);
+  if(data.type === 'notif') showNotif(data);
+  if(data.type === 'time') setTime(data);
+};
+
+function setTime(d){
+  document.getElementById('time').textContent = d.time;
+  document.getElementById('date').textContent = d.date;
+  if(d.wallpaper) document.getElementById('phone').style.backgroundImage = `url(${d.wallpaper})`;
+}
+
+function showNotif(d){
+  const n=document.createElement('div');
+  n.className='notif';
+  n.innerHTML=`<strong>${d.app}</strong><div>${d.title}</div><div>${d.body}</div>`;
+  notifs.prepend(n);
+}
+</script>
+</body>
+</html>
