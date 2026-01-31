@@ -55,27 +55,40 @@ button:active{opacity:.85}
 </div>
 
 <script>
-const socket = new WebSocket('wss://demo.piesocket.com/v3/channel/cm-plateau-demo?api_key=demokey&notify_self=1');
+const socket = new WebSocket(
+  'wss://demo.piesocket.com/v3/channel/cm-matguido-film?api_key=demokey&notify_self=1'
+);
 
-function sendTime(){
+let socketReady = false;
+
+socket.addEventListener('open', () => {
+  socketReady = true;
+});
+
+function sendTime() {
+  if (!socketReady) return alert('Connexion pas encore prête');
+
   socket.send(JSON.stringify({
-    type:'time',
-    time:time.value,
-    date:date.value,
-    color:color.value,
-    wallpaper:wallpaper.value
+    type: 'time',
+    time: time.value,
+    date: date.value,
+    color: color.value,
+    wallpaper: wallpaper.value
   }));
 }
 
-function sendNotif(){
+function sendNotif() {
+  if (!socketReady) return alert('Connexion pas encore prête');
+
   socket.send(JSON.stringify({
-    type:'notif',
-    app:app.value,
-    icon:icon.value,
-    title:title.value,
-    body:body.value
+    type: 'notif',
+    app: app.value,
+    icon: icon.value,
+    title: title.value,
+    body: body.value
   }));
 }
 </script>
+
 </body>
 </html>
